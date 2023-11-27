@@ -50,7 +50,7 @@ def run_simulations_gauss(gamma):
                 for _ in range(N_samples):
                     combinations.append([kappa, rho, sigma])
 
-    netw = network_from_txt("lattices/paper_edges.txt", "lattices/paper_nodes.txt")
+    netw = network_from_txt("../lattices/paper_edges.txt", "../lattices/paper_nodes.txt")
     inds = network_indices(netw)
     i = inds[params["source"]]
     maxi = len(combinations)
