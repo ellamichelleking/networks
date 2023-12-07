@@ -33,7 +33,7 @@ def run_simulations_gauss(gamma):
         "N_sigma": 40,
         "sigma_min": 0.1,
         "sigma_max": 5.0,
-        "fluctuations": "gauss",
+        "fluctuations": 'static',#"gauss",
         "source": "left",
         "beta": 1.0 / (1 + gamma)
     }
@@ -73,6 +73,9 @@ def run_simulations_gauss(gamma):
             # NOTE: I'm not sure what "ee" is supposed to be
             ee = 0.1
             currents = corson_currents_fn(ee, netw, source_index=i)
+        elif params['fluctuations']=='static':
+            sink_nodes = np.random.randint(0, netw.N_v, size=50) #choose 50 nodes to act as sinks
+            currents = lambda K, netw: static_currents(K, netw, source_index=i, sink_nodes=sink_nodes)
 
         K, converged = ss_solve(lambda K, t: adaptation_ode(K, t, netw, currents, kappa, params["beta"], rho), K0, Δt=1.0)
         if not converged:

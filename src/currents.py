@@ -11,15 +11,22 @@ Arguments:
     - K: conductivities
     - netw: network geometry, stored in a Network object
     - source_index: index of node acting as source in the system
+    - sink_nodes: indices of nodes to act as sinks. If None, all non-source nodes are sinks
+    - eps_current: value of tiny sink to give passive nodes to prevent numerical instabilities
 Returns:
-    - flows
+    - flows squared
 '''
-def static_currents(K, netw, source_index=0):
+def static_currents(K, netw, source_index=0, sink_nodes=None, eps_sink = 5e-4):
     E = netw.E[1:, :] # E is the indcidence matrix
     L = E @ np.diag(K) @ E.T # L is the Laplacian
-    q = -np.ones(netw.N_v) / (netw.N_v - 1) # assumes everything but the source is a sink
+    if sink_nodes is None:
+        q = -np.ones(netw.N_v) / (netw.N_v - 1) # assumes everything but the source is a sink
+    else:
+        q = -np.ones(netw.N_v) * eps_sink
+        q[sink_nodes] = -1.0
+        q[source_index] = 0
+        q /= np.sum(q)
     q[source_index] = 1.0
-
     q_reduced = q[1:]
 
     p = np.linalg.solve(L, q_reduced) #p is the pressure
