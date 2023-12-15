@@ -17,7 +17,7 @@ Returns:
     - flows squared
 '''
 def static_currents(K, netw, source_index=0, sink_nodes=None, eps_sink = 5e-4):
-    E = netw.E[1:, :] # E is the indcidence matrix
+    E = netw.E[1:, :] # E is the incidence matrix
     L = E @ np.diag(K) @ E.T # L is the Laplacian
     if sink_nodes is None:
         q = -np.ones(netw.N_v) / (netw.N_v - 1) # assumes everything but the source is a sink
@@ -25,11 +25,11 @@ def static_currents(K, netw, source_index=0, sink_nodes=None, eps_sink = 5e-4):
         q = -np.ones(netw.N_v) * eps_sink
         q[sink_nodes] = -1.0
         q[source_index] = 0
-        q /= np.sum(q)
+        q /= -np.sum(q)
     q[source_index] = 1.0
     q_reduced = q[1:]
 
-    p = np.linalg.solve(L, q_reduced) #p is the pressure
+    p = np.dot(np.linalg.inv(L), q_reduced) #p is the pressure
     F = K * (E.T @ p) # flows = conductivities * pressures
 
     return F ** 2
