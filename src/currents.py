@@ -63,7 +63,8 @@ def correlated_currents_fun(netw, f, source_index=0):
         E = netw.E[1:, :]
         L = E @ np.diag(K) @ E.T
 
-        p = np.linalg.solve(L, Q_reduced)
+        #p = np.linalg.solve(L, Q_reduced)
+        p = np.dot(np.linalg.inv(L), Q_reduced)
         F = K[:, np.newaxis] * (E.T @ p)
         return np.mean(F ** 2, axis=1)
 
@@ -101,7 +102,8 @@ def corson_currents_fun(ee, netw, source_index=0):
         E = netw.E[1:, :]
         L = E @ np.diag(K) @ E.T
 
-        p = np.linalg.solve(L, Q_reduced)
+        #p = np.linalg.solve(L, Q_reduced)
+        p = np.dot(np.linalg.inv(L), Q_reduced)
         F = K[:, np.newaxis] * (E.T @ p)
 
         return np.mean(F ** 2, axis=1)
@@ -136,7 +138,8 @@ def random_currents_fun(p, netw, source_index=0):
         E = netw.E[1:, :]
         L = E @ np.diag(K) @ E.T
 
-        p = np.linalg.solve(L, Q_reduced)
+        #p = np.linalg.solve(L, Q_reduced)
+        p = np.dot(np.linalg.inv(L), Q_reduced)
         F = K[:, np.newaxis] * (E.T @ p)
         return np.mean(F ** 2, axis=1)
 
