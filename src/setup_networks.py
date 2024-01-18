@@ -32,6 +32,10 @@ Reads network from text into a Network object
 def network_from_txt(edges, nodes, zoom=1.0):
     edgelist_float = np.loadtxt(edges, dtype=float)# + 1
     edgelist = edgelist_float.astype(int)
+
+    sort_index = np.argsort(edgelist[:,0])
+    edgelist = edgelist[sort_index]
+
     pos = np.loadtxt(nodes)
     
     N_e = len(edgelist) 
