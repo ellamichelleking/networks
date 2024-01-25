@@ -65,3 +65,27 @@ def network_indices(netw):
     i_center = np.argmin([np.linalg.norm(netw.pos[i] - com) for i in range(netw.N_v)])
 
     return {"center": i_center, "left": i_left}
+
+'''
+Reads network from arrays into a Network object
+    - edges: array containing edges in the network (list of pairs of IDs)
+    - nodes: array containing xy(z) positions of nodes in the network
+'''    
+def network_from_edges_and_nodes(edges, pos, zoom=1.0):
+    edges = np.array(edges)
+    pos = np.array(pos)
+    edgelist = edges.astype(int)
+    N_e = len(edgelist) 
+    N_v = len(pos)
+    
+    # remove overly long edges
+    lengths = np.linalg.norm(pos[edgelist[:, 0]] - pos[edgelist[:, 1]], axis=1)
+    mean_len = np.mean(lengths)
+
+    J = np.tile(np.arange(N_e), 2)
+    I = np.concatenate([edgelist[:,0], edgelist[:,1]])
+    V = np.concatenate([np.ones(N_e), -1*np.ones(N_e)])
+
+    E = sparse.csr_matrix((V, (I, J)), shape=(N_v, N_e))
+
+    return Network(pos, edgelist, E, N_e, N_v, mean_len, lengths)
