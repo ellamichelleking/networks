@@ -35,6 +35,45 @@ def static_currents(K, netw, source_index=0, sink_nodes=None, eps_sink = 5e-4):
     return F ** 2
 
 
+
+'''
+Computes the flows given mixed pressure/current boundary conditions.
+
+Inputs:
+    - K: conductivities
+    - netw: network geometry, stored in a Network object
+    - source_ps: pressures at the fixed pressure boundaries (both sources and sinks)
+    - source_p_inds: indices of the nodes at which pressure boundary conditions are set
+    - source_qs: pressures at the fixed current boundaries (both sources and sinks)
+    - source_q_inds: indices of the nodes at which current boundary conditions are set
+'''
+def mixed_boundary_condition_currents(K, netw, source_ps, source_p_inds, source_qs, source_q_inds):
+        
+    #I think we don't need to set a ground anymore (no gauge freedom)
+    E = netw.E # E is the incidence matrix 
+    L = E @ np.diag(K) @ E.T # L is the Laplacian
+    
+    Np = len(source_ps)
+    Nc = len(source_qs)
+    N = len(netw.pos)
+    
+    B = np.zeros((Np, N))
+    B[np.arange(len(source_p_inds)), source_p_inds] = 1
+
+    augL = np.zeros((N+Np, N+Np))
+    augL[:N, :N] = L
+    augL[N:, :B.shape[1]] = B
+    augL[:B.shape[1], N:] = B.T
+
+    
+    aug_q = np.zeros(N+Np)
+    aug_q[source_q_inds] = source_qs
+    aug_q[N:] = -source_ps
+    aug_p = -np.dot(np.linalg.inv(augL), aug_q)
+    F = K * (E.T @ aug_p[:N])
+    return F**2
+
+
 '''
 Computes the flows in the network assuming correlations in the currents in 
 the network that are described by function f, which acts on distances between nodes
