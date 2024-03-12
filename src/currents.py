@@ -46,8 +46,12 @@ Inputs:
     - source_p_inds: indices of the nodes at which pressure boundary conditions are set
     - source_qs: pressures at the fixed current boundaries (both sources and sinks)
     - source_q_inds: indices of the nodes at which current boundary conditions are set
+    - eps_sink: value of tiny sink current to give passive nodes to prevent numerical instabilities
+    - return_squared: boolean that determines whether to return the flows or flows**2
 '''
-def mixed_boundary_condition_currents(K, netw, source_ps, source_p_inds, source_qs, source_q_inds):
+def mixed_boundary_condition_currents(K, netw, source_ps, source_p_inds, 
+                                      source_qs, source_q_inds, eps_sink=0.,
+                                      return_squared=True):
         
     #I think we don't need to set a ground anymore (no gauge freedom)
     E = netw.E # E is the incidence matrix 
@@ -57,6 +61,8 @@ def mixed_boundary_condition_currents(K, netw, source_ps, source_p_inds, source_
     Nc = len(source_qs)
     N = len(netw.pos)
     
+    source_p_inds = np.array(source_p_inds, dtype=int)
+    source_q_inds = np.array(source_q_inds, dtype=int)
     B = np.zeros((Np, N))
     B[np.arange(len(source_p_inds)), source_p_inds] = 1
 
@@ -69,9 +75,14 @@ def mixed_boundary_condition_currents(K, netw, source_ps, source_p_inds, source_
     aug_q = np.zeros(N+Np)
     aug_q[source_q_inds] = source_qs
     aug_q[N:] = -source_ps
+    aug_q = np.where(aug_q==0., eps_sink, aug_q)
+    #aug_q /= np.sum(aug_q)
+    
     aug_p = -np.dot(np.linalg.inv(augL), aug_q)
     F = K * (E.T @ aug_p[:N])
-    return F**2
+    if return_squared:
+        return F**2
+    return F
 
 
 '''
