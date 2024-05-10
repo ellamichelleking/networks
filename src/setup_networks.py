@@ -134,7 +134,7 @@ def get_edges(node_positions):
         di = dists[i]
         edge_candidates = np.where(di < 1.3*lattice_spacing)[0]
         for e in edge_candidates:
-            if e != i:
+            if e > i:
                 edges += [[i, e]]
             
     return np.array(edges)
