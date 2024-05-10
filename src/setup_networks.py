@@ -89,3 +89,52 @@ def network_from_edges_and_nodes(edges, pos, zoom=1.0):
     E = sparse.csr_matrix((V, (I, J)), shape=(N_v, N_e))
 
     return Network(pos, edgelist, E, N_e, N_v, mean_len, lengths)
+
+
+
+
+'''
+Get xy coordinates for a triangular lattice with N_pts nodes and
+a lattice spacing of lattice_spacing. Returns array of shape (N_pts, 2). 
+
+Note that N_pts is assumed to be a perfect square; if it is not,
+then an array of shape (sqrt(N_pts)**2, 2) will be returned.
+'''
+def triangular_lattice_pts(N_pts, lattice_spacing=0.5):
+    N_pts_per_side = int(np.sqrt(N_pts))
+    z_spacing = lattice_spacing*np.sqrt(3)/2
+    
+    tri = np.zeros((N_pts_per_side**2, 2))
+    L = N_pts_per_side * lattice_spacing #Side length
+    for i in range(N_pts_per_side):
+        if i % 2 == 0:
+            
+            tri[i*N_pts_per_side:(i+1)*N_pts_per_side, 0] = np.arange(0, L, lattice_spacing)
+        else:
+            tri[i*N_pts_per_side:(i+1)*N_pts_per_side, 0] = np.arange(lattice_spacing/2, L+lattice_spacing/2, lattice_spacing)
+
+        tri[i*N_pts_per_side:(i+1)*N_pts_per_side, 1] = np.full(N_pts_per_side, i*z_spacing)
+        
+    return tri
+
+
+'''
+Create list of edges given a list of 2D node positions.
+Assumes that all neighboring points are connected by edges.
+'''
+def get_edges(node_positions):
+    # Compute matrix of distances between all node positions
+    dist_fn = lambda x: np.linalg.norm(x[np.newaxis, :, :] - x[:, np.newaxis, :], axis=2)
+    dists = dist_fn(node_positions)
+    lattice_spacing = np.min(dists[np.nonzero(dists)])
+    
+    # If distances are nonzero and less than 1.5*lattice_spacing, add an edge
+    edges = []
+    for i in range(len(dists)):
+        di = dists[i]
+        edge_candidates = np.where(di < 1.3*lattice_spacing)[0]
+        for e in edge_candidates:
+            if e != i:
+                edges += [[i, e]]
+            
+    return np.array(edges)
