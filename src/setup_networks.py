@@ -138,3 +138,24 @@ def get_edges(node_positions):
                 edges += [[i, e]]
             
     return np.array(edges)
+
+
+'''
+Save the nodes and edges from a Network object (netw) to two 
+files with the names filename_nodes.npy and filename_edges.npy.
+'''
+def save_network(netw, filename):
+    nodes = netw.pos
+    edges = list(netw.edgelist)
+    np.save(filename + '_nodes', nodes, allow_pickle=False)
+    np.save(filename + '_edges', edges, allow_pickle=False)
+
+
+'''
+Having saved a network via the save_network method above, this 
+function loads the network into a Network object and returns that object.
+'''
+def load_network(filename):
+    nodes = np.load(filename + "_nodes.npy")
+    edges = np.load(filename + "_edges.npy")
+    return network_from_edges_and_nodes(edges, nodes)
