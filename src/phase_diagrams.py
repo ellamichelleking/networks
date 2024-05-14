@@ -62,8 +62,8 @@ def make_ellipse_netw(netw, a, b):
     center_ind = network_indices(netw)['center']
 
     max_dist = np.max(np.linalg.norm(netw.pos - netw.pos[center_ind], axis=1))
-    a = a/max_dist
-    b = b/max_dist
+    a = a * max_dist
+    b = b * max_dist
     
     ellipse_dist_fn = lambda x: (x[:, 0] - x[center_ind,0])**2/a**2 + (x[:, 1]-x[center_ind,1])**2/b**2
     ellipse_dists = ellipse_dist_fn(netw.pos)
