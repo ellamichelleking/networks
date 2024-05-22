@@ -61,7 +61,7 @@ with open(run_dir + "/params.txt", "w+") as f:
 nodes = triangular_lattice_pts(N_nodes, edge_len)
 edges = get_edges(nodes)
 netw_ = network_from_edges_and_nodes(edges, nodes)
-netw = make_ellipse_netw(netw_, 1.0, 1.0) #ensure final network structure has no edges
+netw = make_ellipse_netw(netw_, 0.5, 0.5) #ensure final network structure has no edges
 netw = make_ellipse_netw(netw, 1.0, ellipse_ratio)
 
 inds = network_indices(netw)
