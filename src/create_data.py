@@ -19,7 +19,7 @@ parser.add_argument('-f', '--filename', type=str, default="expgrowth")
 parser.add_argument('-el', '--ellipse_ratio', type=float, default=1.0, help='ratio of ellipse axis lengths')
 parser.add_argument('-N', '--N_nodes', type=int, default=10000)
 parser.add_argument('-len', '--edge_len', type=float, default=0.08) #Changing this value causes errors. Unsure why - maybe "overly long lengths" comment in network initialization
-parser.add_argument('-Ns', '--N_sinks', type=int, default=50)
+parser.add_argument('-Ns', '--N_sinks', type=int, default=90)
 parser.add_argument('-g', '--gamma', type=float, default=0.5)
 parser.add_argument('-ip', '--insertion_point', type=str, default='center', help='center or left')
 parser.add_argument('-k', '--N_kappas',type=int, default=10)
