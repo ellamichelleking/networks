@@ -19,7 +19,7 @@ parser.add_argument('-f', '--filename', type=str, default="expgrowth")
 parser.add_argument('-el', '--ellipse_ratio', type=float, default=1.0, help='ratio of ellipse axis lengths')
 parser.add_argument('-N', '--N_nodes', type=int, default=10000)
 parser.add_argument('-len', '--edge_len', type=float, default=0.08) #Changing this value causes errors. Unsure why - maybe "overly long lengths" comment in network initialization
-parser.add_argument('-Ns', '--N_sinks', type=int, default=90)
+#parser.add_argument('-Ns', '--N_sinks', type=int, default=90)
 parser.add_argument('-g', '--gamma', type=float, default=0.5)
 parser.add_argument('-ip', '--insertion_point', type=str, default='center', help='center or left')
 parser.add_argument('-k', '--N_kappas',type=int, default=10)
@@ -35,13 +35,16 @@ N_nodes = args['N_nodes']
 edge_len = args['edge_len']
 ellipse_ratio = args['ellipse_ratio']
 insertion_point = args['insertion_point']
-N_sinks = args['N_sinks']
+#N_sinks = args['N_sinks']
 gamma = args['gamma']
 N_kappas = args['N_kappas']
 N_rhos = args['N_rhos']
 N_replicates = args['N_replicates']
 beta = 1.0 / (1 + gamma)
 
+N_sinks = 90
+if ellipse_ratio==1.0:
+    N_sinks = 40
 
 # Create a directory to store the data for these input parameters
 run_dir = '../data/' + filename + f'_el{ellipse_ratio}_ip{insertion_point}'
