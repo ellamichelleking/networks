@@ -11,6 +11,17 @@ from currents import *
 from adaptation import adaptation_ode, ss_solve
 from measures import steady_state_dissipation
 
+'''
+Given a netw object (defined in setup_networks) with edge weights K, convert to a networkx graph.
+'''
+def netw_to_nx(netw, K):
+    G = nx.Graph()
+    weighted_edges = np.append(netw.edgelist, 1/K[:, np.newaxis], 1)
+    G.add_nodes_from(np.arange(len(netw.pos)))
+    G.add_weighted_edges_from(weighted_edges, weight='K')
+    return G
+
+
 
 '''
 Compute lengths and weights of the shortest paths from the source to each of the sinks. The length is defiend as the number of edges in the path and the associated weights is 1/conductivities of the edges.
