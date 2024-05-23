@@ -91,8 +91,8 @@ for k in kappas:
             if converged:
                 print('Converged')
 
-            np.savetxt(run_dir + f'/Ks/K_kappa{k}_rho{p}_replicate{r}.txt', K)
-            np.savetxt(run_dir + f'/sink_nodes/sink_nodes_kappa{k}_rho{p}_replicate{r}.txt', sink_nodes)
+            np.savetxt(run_dir + f'/Ks/K_kappa{np.round(k, 5)}_rho{np.round(p, 5)}_replicate{r}.txt', K)
+            np.savetxt(run_dir + f'/sink_nodes/sink_nodes_kappa{np.round(k, 5)}_rho{np.round(p, 5)}_replicate{r}.txt', sink_nodes)
 
 
 
