@@ -19,7 +19,7 @@ parser.add_argument('-f', '--filename', type=str, default="expgrowth")
 parser.add_argument('-el', '--ellipse_ratio', type=float, default=1.0, help='ratio of ellipse axis lengths')
 parser.add_argument('-N', '--N_nodes', type=int, default=10000)
 parser.add_argument('-len', '--edge_len', type=float, default=0.08) #Changing this value causes errors. Unsure why - maybe "overly long lengths" comment in network initialization
-parser.add_argument('-Ns', '--N_sinks', type=int, default=40)
+#parser.add_argument('-Ns', '--N_sinks', type=int, default=90)
 parser.add_argument('-g', '--gamma', type=float, default=0.5)
 parser.add_argument('-ip', '--insertion_point', type=str, default='center', help='center or left')
 parser.add_argument('-k', '--N_kappas',type=int, default=10)
@@ -35,13 +35,16 @@ N_nodes = args['N_nodes']
 edge_len = args['edge_len']
 ellipse_ratio = args['ellipse_ratio']
 insertion_point = args['insertion_point']
-N_sinks = args['N_sinks']
+#N_sinks = args['N_sinks']
 gamma = args['gamma']
 N_kappas = args['N_kappas']
 N_rhos = args['N_rhos']
 N_replicates = args['N_replicates']
 beta = 1.0 / (1 + gamma)
 
+N_sinks = 90
+if ellipse_ratio==1.0:
+    N_sinks = 40
 
 # Create a directory to store the data for these input parameters
 run_dir = '../data/' + filename + f'_el{ellipse_ratio}_ip{insertion_point}'
@@ -61,7 +64,7 @@ with open(run_dir + "/params.txt", "w+") as f:
 nodes = triangular_lattice_pts(N_nodes, edge_len)
 edges = get_edges(nodes)
 netw_ = network_from_edges_and_nodes(edges, nodes)
-netw = make_ellipse_netw(netw_, 1.0, 1.0) #ensure final network structure has no edges
+netw = make_ellipse_netw(netw_, 0.5, 0.5) #ensure final network structure has no edges
 netw = make_ellipse_netw(netw, 1.0, ellipse_ratio)
 
 inds = network_indices(netw)
@@ -82,13 +85,14 @@ for k in kappas:
             num_sinks = np.random.randint(N_sinks-5, N_sinks+5) #vary number of sinks within the usual biological range (30-40) (Note: get_sinks returns fewer than the specified #)
 
             sink_nodes = get_sinks(num_sinks, netw)
+            print('num sinks: ', len(sink_nodes))
             currents = lambda K, netw: static_currents(K, netw, source_index=source_ind, sink_nodes=sink_nodes)
             K, converged = ss_solve(lambda K, t: adaptation_ode(K, t, netw, currents, k, beta, p), K0, Δt=1.0)
             if converged:
                 print('Converged')
 
-            np.savetxt(run_dir + f'/Ks/K_kappa{k}_rho{p}_replicate{r}_Nsinks{len(sink_nodes)}.txt', K)
-            np.savetxt(run_dir + f'/sink_nodes/sink_nodes_kappa{k}_rho{p}_replicate{r}_Nsinks{len(sink_nodes)}.txt', sink_nodes)
+            np.savetxt(run_dir + f'/Ks/K_kappa{np.round(k, 5)}_rho{np.round(p, 5)}_replicate{r}.txt', K)
+            np.savetxt(run_dir + f'/sink_nodes/sink_nodes_kappa{np.round(k, 5)}_rho{np.round(p, 5)}_replicate{r}.txt', sink_nodes)
 
 
 

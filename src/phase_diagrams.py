@@ -11,6 +11,17 @@ from currents import *
 from adaptation import adaptation_ode, ss_solve
 from measures import steady_state_dissipation
 
+'''
+Given a netw object (defined in setup_networks) with edge weights K, convert to a networkx graph.
+'''
+def netw_to_nx(netw, K):
+    G = nx.Graph()
+    weighted_edges = np.append(netw.edgelist, 1/K[:, np.newaxis], 1)
+    G.add_nodes_from(np.arange(len(netw.pos)))
+    G.add_weighted_edges_from(weighted_edges, weight='K')
+    return G
+
+
 
 '''
 Compute lengths and weights of the shortest paths from the source to each of the sinks. The length is defiend as the number of edges in the path and the associated weights is 1/conductivities of the edges.
@@ -43,6 +54,53 @@ def get_path_lengths(netw, source, sinks, K):
         
     N_sinks = len(sinks)
     return path_length/N_sinks, path_weight/N_sinks
+
+
+'''
+Given a Network object and a ratio of the two ellipse axes (1.0 if circle), returns
+the square root of the area of the network.
+'''
+def sqrt_area_of_network(netw, ellipse_ratio):
+    inds = network_indices(netw)
+    left_idx = inds['left']
+    dist_fn = lambda x: np.linalg.norm(x[left_idx] - x, axis=1)
+    dists = dist_fn(netw.pos)
+    long_axis = np.max(dists) / 2
+    short_axis = long_axis*ellipse_ratio
+    return np.sqrt(np.pi * long_axis * short_axis)
+
+'''
+Arguments:
+    - netw: Network object
+    - K: list of conductances for each edge in the network
+    - insertion_point: string ('center' or 'left') indicating the position of the source in the network
+Returns: 
+    - path_length: list of lengths of all paths from the source to the branch points in the network, 
+        where the length is measured in the number of nodes
+    - path_weight: list of lengths of all paths from the source to the branch points in the network, 
+        where the length is measured in 1/conductance
+'''
+def distance_insertion_to_branch_points(netw, K, insertion_point='center'):
+    clipped_netw, clipped_K = remove_edges(netw, K)
+    G = netw_to_nx(clipped_netw, clipped_K)
+    
+    inds = network_indices(clipped_netw)
+    source = inds[insertion_point]
+    
+    degrees = np.array(list(G.degree))
+    branch_points = np.where(degrees[:, 1] > 2)[0]
+    
+    
+    path_length = []
+    path_weight = []
+    for b in branch_points:
+        path = nx.dijkstra_path(G, source, b, weight='K')
+        pathweight = nx.path_weight(G, path, weight='K')
+        
+        path_length += [len(path)]
+        path_weight += [pathweight]
+        
+    return path_length, path_weight
 
 
 
