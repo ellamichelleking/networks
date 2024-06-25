@@ -16,13 +16,14 @@ Arguments:
 Returns:
     - flows squared
 '''
-def static_currents(K, netw, source_index=0, sink_nodes=None, eps_sink = 5e-4):
+def static_currents(K, netw, source_index=0, sink_nodes=None, eps_sink = 0., min_K=1e-8):
+    K = np.where(np.abs(K) < min_K, np.sign(K)*min_K, K) #"cheat" (fix matrix inversion errors) by having a minimum allowed conductance
     E = netw.E[1:, :] # E is the incidence matrix
     L = E @ np.diag(K) @ E.T # L is the Laplacian
     if sink_nodes is None:
         q = -np.ones(netw.N_v) / (netw.N_v - 1) # assumes everything but the source is a sink
     else:
-        q = -np.ones(netw.N_v) * eps_sink
+        q = -np.ones(netw.N_v) * eps_sink # "cheat" (fix matrix inversion errors) by having a small sink current everywhere
         q[sink_nodes] = -1.0
         q[source_index] = 0
         q /= -np.sum(q)
