@@ -41,6 +41,7 @@ N_kappas = args['N_kappas']
 N_rhos = args['N_rhos']
 N_replicates = args['N_replicates']
 beta = 1.0 / (1 + gamma)
+use_triangular_lattice = False
 
 N_sinks = 90
 if ellipse_ratio==1.0:
@@ -61,8 +62,13 @@ with open(run_dir + "/params.txt", "w+") as f:
 
 
 # Create a network with the specified number of nodes (Note: we will cut circular/elliptical subsections from this network)
-nodes = triangular_lattice_pts(N_nodes, edge_len)
-edges = get_edges(nodes)
+if use_triangular_lattice:
+    nodes = triangular_lattice_pts(N_nodes, edge_len)
+    edges = get_edges(nodes)
+else:
+    lattice_dir = '../lattices/'
+    nodes = np.loadtxt(lattice_dir + 'nodes_10k.txt')
+    edges = np.loadtxt(lattice_dir + 'edges_10k.txt')
 netw_ = network_from_edges_and_nodes(edges, nodes)
 netw = make_ellipse_netw(netw_, 0.5, 0.5) #ensure final network structure has no edges
 netw = make_ellipse_netw(netw, 1.0, ellipse_ratio)
