@@ -67,8 +67,8 @@ if use_triangular_lattice:
     edges = get_edges(nodes)
 else:
     lattice_dir = '../lattices/'
-    nodes = np.loadtxt(lattice_dir + 'nodes_10k.txt')
-    edges = np.loadtxt(lattice_dir + 'edges_10k.txt')
+    nodes = np.loadtxt(lattice_dir + 'nodes_10k_v2.txt')
+    edges = np.loadtxt(lattice_dir + 'edges_10k_v2.txt')
 netw_ = network_from_edges_and_nodes(edges, nodes)
 netw = make_ellipse_netw(netw_, 0.5, 0.5) #ensure final network structure has no edges
 netw = make_ellipse_netw(netw, 1.0, ellipse_ratio)

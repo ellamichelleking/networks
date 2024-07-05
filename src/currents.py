@@ -17,6 +17,7 @@ Returns:
     - flows squared
 '''
 def static_currents(K, netw, source_index=0, sink_nodes=None, eps_sink = 0., min_K=1e-8):
+    K = K/netw.lengths # transform from conductance to conductivity
     K = np.where(np.abs(K) < min_K, np.sign(K)*min_K, K) #"cheat" (fix matrix inversion errors) by having a minimum allowed conductance
     E = netw.E[1:, :] # E is the incidence matrix
     L = E @ np.diag(K) @ E.T # L is the Laplacian
