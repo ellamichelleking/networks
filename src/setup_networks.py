@@ -64,7 +64,10 @@ def network_indices(netw):
     com = np.mean(netw.pos, axis=0)
     i_center = np.argmin([np.linalg.norm(netw.pos[i] - com) for i in range(netw.N_v)])
 
-    return {"center": i_center, "left": i_left}
+    inds_sorted = np.argsort(netw.pos[:,0])
+    i_partly_left = inds_sorted[int(len(inds_sorted)/8)]
+
+    return {"center": i_center, "left": i_left, "partly_left": i_partly_left}
 
 '''
 Reads network from arrays into a Network object
