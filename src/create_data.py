@@ -73,7 +73,12 @@ else:
     nodes = np.loadtxt(lattice_dir + 'nodes_10k_v2.txt')
     edges = np.loadtxt(lattice_dir + 'edges_10k_v2.txt')
 netw_ = network_from_edges_and_nodes(edges, nodes)
-netw = make_ellipse_netw(netw_, 0.5, 0.5) #ensure final network structure has no edges
+
+if ellipse_ratio==1.0:
+    circle_cutoff = 0.35
+else:
+    circle_cutoff = 0.5
+netw = make_ellipse_netw(netw_, circle_cutoff, circle_cutoff) #ensure final network structure has no edges
 netw = make_ellipse_netw(netw, 1.0, ellipse_ratio)
 
 inds = network_indices(netw)
