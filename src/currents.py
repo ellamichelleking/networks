@@ -1,5 +1,5 @@
 import numpy as np
-from scipy.linalg import solve
+from scipy.linalg import solve, lu_factor, lu_solve
 import random
 
 
@@ -31,7 +31,10 @@ def static_currents(K, netw, source_index=0, sink_nodes=None, eps_sink = 0., min
     q[source_index] = 1.0
     q_reduced = q[1:]
 
-    p = np.dot(np.linalg.inv(L), q_reduced) #p is the pressure
+    #p = np.dot(np.linalg.inv(L), q_reduced) #p is the pressure
+    L_inv = lu_factor(L) #approximate inverse with lower-upper decomposition - more accurate
+    p = lu_solve(L_inv, q_reduced)
+    
     F = K * (E.T @ p) # flows = conductivities * pressures
 
     return F ** 2
